@@ -1,23 +1,92 @@
 import 'package:flutter/material.dart';
-//TODO: Step 2 - Import the rFlutter_Alert package here.
 import 'package:rflutter_alert/rflutter_alert.dart';
+
 import 'quiz_brain.dart';
 
 QuizBrain quizBrain = QuizBrain();
 
-void main() => runApp(Quizzler());
+void main() {
+  runApp(MaterialApp(
+    debugShowCheckedModeBanner: false,
+    initialRoute: '/',
+    routes: {
+      '/': (context) => HomePage(),
+      '/second': (context) => Quiz(),
+    },
+  ));
+}
 
-class Quizzler extends StatelessWidget {
+class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        backgroundColor: Colors.grey.shade900,
-        body: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 10.0),
-            child: QuizPage(),
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.teal,
+        title: Text(
+          'It\'s Quiz Time',
+          style: TextStyle(
+            fontSize: 35.0,
+            fontWeight: FontWeight.bold,
           ),
+        ),
+        centerTitle: true,
+      ),
+      drawer: Drawer(
+        child: Text('sohaib'),
+      ),
+
+      body: SafeArea(
+        child: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              fit: BoxFit.fill,
+              image: AssetImage('images/bgImg.jpg'),
+              colorFilter: ColorFilter.mode(
+                Colors.grey.withOpacity(0.5),
+                BlendMode.dstATop,
+              ),
+            ),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              Text(
+                'Let\'s check your awareness on COVID-19 precautionary measures?',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 40.0,
+                  color: Colors.brown.shade900,
+                ),
+              ),
+              RaisedButton(
+                padding: EdgeInsets.all(15.0),
+                elevation: 5.0,
+                color: Colors.lightGreen.shade200,
+                onPressed: () {
+                  Navigator.pushNamed(context, '/second');
+                },
+                child: Text(
+                  'Start Quiz',
+                  style: TextStyle(fontSize: 40.0, color: Colors.red),
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class Quiz extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey.shade900,
+      body: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 10.0),
+          child: QuizPage(),
         ),
       ),
     );
@@ -31,47 +100,79 @@ class QuizPage extends StatefulWidget {
 
 class _QuizPageState extends State<QuizPage> {
   List<Icon> scoreKeeper = [];
+  int countCorrectAns = 0;
+  int totalNoOfQuestions = quizBrain.getCountOfQuestions();
 
-  void checkAnswer(bool userPickedAnswer) {
-    bool correctAnswer = quizBrain.getCorrectAnswer();
-
+  void checkAnswer(BuildContext context, bool userAns) {
     setState(() {
-      //TODO: Step 4 - Use IF/ELSE to check if we've reached the end of the quiz. If so,
-      //On the next line, you can also use if (quizBrain.isFinished()) {}, it does the same thing.
-      if (quizBrain.isFinished() == true) {
-        //TODO Step 4 Part A - show an alert using rFlutter_alert,
-
-        //This is the code for the basic alert from the docs for rFlutter Alert:
-        //Alert(context: context, title: "RFLUTTER", desc: "Flutter is awesome.").show();
-
-        //Modified for our purposes:
-
-        Alert(
-          context: context,
-          title: 'Finished!',
-          desc: 'You\'ve reached the end of the quiz.',
-        ).show();
-
-        //TODO Step 4 Part C - reset the questionNumber,
-        quizBrain.reset();
-
-        //TODO Step 4 Part D - empty out the scoreKeeper.
-        scoreKeeper = [];
-      }
-
-      //TODO: Step 6 - If we've not reached the end, ELSE do the answer checking steps below 👇
-      else {
-        if (userPickedAnswer == correctAnswer) {
-          scoreKeeper.add(Icon(
+      if (quizBrain.getAnswer() == userAns) {
+        scoreKeeper.add(
+          Icon(
             Icons.check,
             color: Colors.green,
-          ));
-        } else {
-          scoreKeeper.add(Icon(
+          ),
+        );
+        countCorrectAns++;
+      } else {
+        scoreKeeper.add(
+          Icon(
             Icons.close,
             color: Colors.red,
-          ));
+          ),
+        );
+      }
+
+      if (quizBrain.isFinished()) {
+        if (countCorrectAns >= totalNoOfQuestions / 2) {
+          Alert(
+            closeFunction: () => Navigator.pop(context),
+            context: context,
+            type: AlertType.success,
+            title: "Hurray!",
+            desc:
+            "You scored $countCorrectAns/$totalNoOfQuestions questions correct! You are well aware about COVID-19 precautions.",
+            buttons: [
+              DialogButton(
+                child: Text(
+                  "Exit the quiz",
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                },
+                width: 200,
+              )
+            ],
+          ).show();
+        } else {
+          Alert(
+            closeFunction: () => Navigator.pop(context),
+            context: context,
+            type: AlertType.error,
+            title: "Oh No!",
+            desc:
+            "You scored $countCorrectAns/$totalNoOfQuestions questions correct! I'm afraid you aren\'t much aware about COVID-19 precautions.",
+            buttons: [
+              DialogButton(
+                child: Text(
+                  "Take Quiz Again",
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                },
+                width: 200,
+              )
+            ],
+          ).show();
         }
+
+        quizBrain.reset();
+        scoreKeeper.clear();
+        countCorrectAns = 0;
+      } else {
         quizBrain.nextQuestion();
       }
     });
@@ -80,7 +181,7 @@ class _QuizPageState extends State<QuizPage> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         Expanded(
@@ -89,7 +190,7 @@ class _QuizPageState extends State<QuizPage> {
             padding: EdgeInsets.all(10.0),
             child: Center(
               child: Text(
-                quizBrain.getQuestionText(),
+                quizBrain.getQuestion(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 25.0,
@@ -113,8 +214,7 @@ class _QuizPageState extends State<QuizPage> {
                 ),
               ),
               onPressed: () {
-                //The user picked true.
-                checkAnswer(true);
+                checkAnswer(context, true);
               },
             ),
           ),
@@ -132,22 +232,17 @@ class _QuizPageState extends State<QuizPage> {
                 ),
               ),
               onPressed: () {
-                //The user picked false.
-                checkAnswer(false);
+                checkAnswer(context, false);
               },
             ),
           ),
         ),
-        Row(
-          children: scoreKeeper,
+        Expanded(
+          child: Row(
+            children: scoreKeeper,
+          ),
         )
       ],
     );
   }
 }
-
-/*
-question1: 'You can lead a cow down stairs but not up stairs.', false,
-question2: 'Approximately one quarter of human bones are in the feet.', true,
-question3: 'A slug\'s blood is green.', true,
-*/
