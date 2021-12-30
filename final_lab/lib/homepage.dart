@@ -20,7 +20,7 @@ class homepage extends StatelessWidget {
               child: Text('Menu'),
             ),
             ListTile(
-              title: Text('SIMPLE'),
+              title: Text('SIMPLE Password'),
               onTap: () {
                 Navigator.push(
                   context,
@@ -29,7 +29,7 @@ class homepage extends StatelessWidget {
               },
             ),
             ListTile(
-              title: Text('HARD'),
+              title: Text('HARD Password'),
               onTap: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
                   return hardpage();
@@ -40,7 +40,7 @@ class homepage extends StatelessWidget {
         ),
       ),
       appBar: AppBar(
-        title: Text('Homepage | Password Generator'),
+        title: Text('Password Generator'),
         centerTitle: true,
       ),
       body: Container(

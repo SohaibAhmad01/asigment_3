@@ -29,7 +29,7 @@ class _hardpageState extends State<hardpage> {
               child: Text('Menu'),
             ),
             ListTile(
-              title: Text('Simple'),
+              title: Text('Simple Password'),
               onTap: () {
                 Navigator.push(
                   context,
@@ -49,7 +49,7 @@ class _hardpageState extends State<hardpage> {
         ),
       ),
       appBar: AppBar(
-        title: Text('Hard Password Generator'),
+        title: Text('Generate Password'),
         centerTitle: true,
       ),
       body: Container(
@@ -59,7 +59,7 @@ class _hardpageState extends State<hardpage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Generate Simple Password',
+              'Generate simple password',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
             ),
             const SizedBox(height: 12),
@@ -77,7 +77,7 @@ class _hardpageState extends State<hardpage> {
 
                     final snackBar = SnackBar(
                         content: Text(
-                          'Password Coppied',
+                          'Copied to clipboard',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         backgroundColor: Colors.blue);
